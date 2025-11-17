@@ -9,6 +9,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
   - [extract_xlf.py](#extract_xlfpy)
   - [find_identical_translations.py](#find_identical_translationspy)
   - [compare_xlf.py](#compare_xlfpy)
+  - [sort_comparisons.py](#sort_comparisonspy)
 - [Data Folders](#data-folders)
 - [License](#license)
 
@@ -17,6 +18,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
 - `extract_xlf.py` - Extract content from XLF files based on trans-unit ID patterns
 - `find_identical_translations.py` - Analyze XLIFF files to find identical source/target translations
 - `compare_xlf.py` - Compare two XLF files to identify translation changes
+- `sort_comparisons.py` - Interactively sort comparison results into user-defined groups
 
 ## Script Details
 
@@ -135,6 +137,45 @@ python compare_xlf.py -n file1.xlf file2.xlf custom_output.tsv
 
 Only entries where the target content has changed (or state has changed when using `-s`) are included in the output.
 
+### sort_comparisons.py
+
+Interactively sorts comparison results into user-defined groups.
+
+**Purpose:** Review translation changes and categorize them into meaningful groups for analysis, reporting, or further action. Useful for organizing changes by type (e.g., "spelling fixes", "new translations", "improvements").
+
+**Input:** TSV files from `xlf-comparisons/`
+
+**Output:** TSV file with original data plus a "Group" column, saved to `sorted-comparisons/`
+
+**Usage:**
+
+```bash
+# Sort a names comparison file, showing columns 3 and 4 (Content Before/After)
+python sort_comparisons.py xlf-comparisons/file_names.tsv 3 4
+
+# Sort a descriptions comparison with custom output path
+python sort_comparisons.py xlf-comparisons/file_descriptions.tsv 4 5 custom_sorted.tsv
+```
+
+**Arguments:**
+
+- `input_file`: Path to TSV file from `xlf-comparisons/`
+- `col1`: First column index to display (1-based, e.g., 3)
+- `col2`: Second column index to display (1-based, e.g., 4)
+- `output_file`: Optional output path (defaults to `sorted-comparisons/<input>_sorted.tsv`)
+
+**Interactive Process:**
+
+For each row in the file:
+
+1. Displays the complete row with all columns
+2. Highlights the two user-specified columns
+3. Shows a numbered list of existing groups
+4. User enters a number to add to existing group, or 0 to create a new group
+5. Process repeats until all rows are sorted
+
+**Output Format:** Original TSV data with an additional "Group" column at the end. Rows are organized by group in the output file.
+
 ## Data Folders
 
 Each subfolder contains specific types of Crowdin files. See individual folder READMEs for details:
@@ -143,6 +184,7 @@ Each subfolder contains specific types of Crowdin files. See individual folder R
 - [`crowdin-exports/README.md`](crowdin-exports/README.md) - Files from Crowdin's "Export to XLIFF" option
 - [`xlf_extracts/README.md`](xlf_extracts/README.md) - Extracted content from XLF files (tab-separated text)
 - [`xlf-comparisons/README.md`](xlf-comparisons/README.md) - Comparison results between XLF file versions
+- [`sorted-comparisons/README.md`](sorted-comparisons/README.md) - Interactively sorted and categorized comparison results
 - [`identical-translations/README.md`](identical-translations/README.md) - Translation analysis output files
 
 ## License
