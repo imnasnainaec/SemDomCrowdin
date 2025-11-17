@@ -2,10 +2,21 @@
 
 A collection of scripts for working with Crowdin translation of Semantic Domain files.
 
+## Table of Contents
+
+- [Scripts](#scripts)
+- [Script Details](#script-details)
+  - [extract_xlf.py](#extract_xlfpy)
+  - [find_identical_translations.py](#find_identical_translationspy)
+  - [compare_xlf.py](#compare_xlfpy)
+- [Data Folders](#data-folders)
+- [License](#license)
+
 ## Scripts
 
 - `extract_xlf.py` - Extract content from XLF files based on trans-unit ID patterns
 - `find_identical_translations.py` - Analyze XLIFF files to find identical source/target translations
+- `compare_xlf.py` - Compare two XLF files to identify translation changes
 
 ## Script Details
 
@@ -78,6 +89,52 @@ The script identifies and categorizes three types of potential issues:
 
 **Output Format:** Text file with categorized results showing matching trans-units, organized by case type. Each entry includes the trans-unit ID, resource name, source text, target text, and matching pieces identified.
 
+### compare_xlf.py
+
+Compares two XLF files to identify translations that have changed between versions.
+
+**Purpose:** Track translation changes over time by comparing XLF files downloaded at different times from Crowdin. Shows both state changes (e.g., "needs-translation" → "translated") and content changes.
+
+**Input:** Two XLF files from `crowdin-downloads/`
+
+**Output:** TSV files saved to `xlf-comparisons/`
+
+**Usage:**
+
+```bash
+# Compare _Name content changes only (no state columns)
+python compare_xlf.py -n crowdin-downloads/SemanticDomains.pt-BR_old.xlf crowdin-downloads/SemanticDomains.pt-BR_new.xlf
+
+# Compare _Name content AND state changes (includes state columns)
+python compare_xlf.py -n -s crowdin-downloads/SemanticDomains.pt-BR_old.xlf crowdin-downloads/SemanticDomains.pt-BR_new.xlf
+
+# Compare _Desc_0 entries between two files
+python compare_xlf.py -d crowdin-downloads/file1.xlf crowdin-downloads/file2.xlf
+
+# Specify a custom output file path
+python compare_xlf.py -n file1.xlf file2.xlf custom_output.tsv
+```
+
+**Options:**
+
+- `-n, --names`: Compare \_Name entries (required, mutually exclusive with -d)
+- `-d, --descriptions`: Compare \_Desc_0 entries (required, mutually exclusive with -n)
+- `-s, --include-state`: Include target state columns in output (optional)
+
+**Output Format:** Tab-separated values (TSV) file with columns varying by comparison type and options:
+
+**Without `-s` flag (content changes only):**
+
+- **Names comparison**: Abbr | Name Source | Content Before | Content After
+- **Descriptions comparison**: Abbr | Name Source | Desc Source | Content Before | Content After
+
+**With `-s` flag (content and state changes):**
+
+- **Names comparison**: Abbr | Name Source | State Before | State After | Content Before | Content After
+- **Descriptions comparison**: Abbr | Name Source | Desc Source | State Before | State After | Content Before | Content After
+
+Only entries where the target content has changed (or state has changed when using `-s`) are included in the output.
+
 ## Data Folders
 
 Each subfolder contains specific types of Crowdin files. See individual folder READMEs for details:
@@ -85,6 +142,7 @@ Each subfolder contains specific types of Crowdin files. See individual folder R
 - [`crowdin-downloads/README.md`](crowdin-downloads/README.md) - Files from Crowdin's "Download" option
 - [`crowdin-exports/README.md`](crowdin-exports/README.md) - Files from Crowdin's "Export to XLIFF" option
 - [`xlf_extracts/README.md`](xlf_extracts/README.md) - Extracted content from XLF files (tab-separated text)
+- [`xlf-comparisons/README.md`](xlf-comparisons/README.md) - Comparison results between XLF file versions
 - [`identical-translations/README.md`](identical-translations/README.md) - Translation analysis output files
 
 ## License
