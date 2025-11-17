@@ -10,6 +10,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
   - [find_identical_translations.py](#find_identical_translationspy)
   - [compare_xlf.py](#compare_xlfpy)
   - [sort_comparisons.py](#sort_comparisonspy)
+  - [count_in_xlf.py](#count_in_xlfpy)
 - [Data Folders](#data-folders)
 - [License](#license)
 
@@ -19,6 +20,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
 - `find_identical_translations.py` - Analyze XLIFF files to find identical source/target translations
 - `compare_xlf.py` - Compare two XLF files to identify translation changes
 - `sort_comparisons.py` - Interactively sort comparison results into user-defined groups
+- `count_in_xlf.py` - Count trans-units in \_Poss groups by target state
 
 ## Script Details
 
@@ -175,6 +177,85 @@ For each row in the file:
 5. Process repeats until all rows are sorted
 
 **Output Format:** Original TSV data with an additional "Group" column at the end. Rows are organized by group in the output file.
+
+### count_in_xlf.py
+
+Counts \_Name and \_Desc_0 trans-units within \_Poss groups, broken down by target state attribute.
+
+**Purpose:** Analyze translation progress by counting how many semantic domain names and descriptions are in each state (final, translated, needs-translation, etc.). Results are broken down by each immediate child of the \_Poss group and summarized with totals across all children.
+
+**Input:** XLF files from `crowdin-downloads/`
+
+**Output:** Console display with formatted statistics
+
+**Usage:**
+
+```bash
+# Count trans-units in an XLF file
+python count_in_xlf.py crowdin-downloads/SemanticDomains.pt-BR.xlf
+
+# Count trans-units in a specific version
+python count_in_xlf.py "crowdin-downloads/SemanticDomains.pt-BR (8).xlf"
+```
+
+**Output Format:**
+
+The script displays:
+
+1. **Individual child group statistics**: For each immediate child of the \_Poss group:
+
+   - Child group identifier (GUID)
+   - \_Name trans-units breakdown by state with counts and percentages
+   - \_Desc_0 trans-units breakdown by state with counts and percentages
+
+2. **Aggregate totals**: Summary across all children:
+   - Total \_Name trans-units by state
+   - Total \_Desc_0 trans-units by state
+   - Grand total of all trans-units
+
+**Target States:**
+
+Common state values include:
+
+- `final` - Translation has been finalized
+- `translated` - Translation is complete but not finalized
+- `needs-translation` - Content needs translation
+- `(no state)` - No state attribute present
+
+**Example Output:**
+
+```
+================================================================================
+LangProject_SemanticDomainList_63403699-07c1-43f3-a47c-069d6e4316e5
+================================================================================
+_Name trans-units (106 total):
+--------------------------------------------------------------------------------
+  final                         :   87 ( 82.1%)
+  translated                    :   19 ( 17.9%)
+
+_Desc_0 trans-units (106 total):
+--------------------------------------------------------------------------------
+  final                         :   82 ( 77.4%)
+  translated                    :   24 ( 22.6%)
+
+================================================================================
+TOTALS ACROSS ALL CHILDREN
+================================================================================
+_Name trans-units (1792 total):
+--------------------------------------------------------------------------------
+  final                         : 1105 ( 61.7%)
+  translated                    :  687 ( 38.3%)
+
+_Desc_0 trans-units (1792 total):
+--------------------------------------------------------------------------------
+  final                         : 1324 ( 73.9%)
+  needs-translation             :   90 (  5.0%)
+  translated                    :  378 ( 21.1%)
+
+================================================================================
+Grand Total: 3584 trans-units across all children
+================================================================================
+```
 
 ## Data Folders
 
