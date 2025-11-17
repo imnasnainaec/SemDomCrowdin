@@ -11,6 +11,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
   - [compare_xlf.py](#compare_xlfpy)
   - [sort_comparisons.py](#sort_comparisonspy)
   - [count_in_xlf.py](#count_in_xlfpy)
+  - [comma_lists.py](#comma_listspy)
 - [Data Folders](#data-folders)
 - [License](#license)
 
@@ -21,6 +22,7 @@ A collection of scripts for working with Crowdin translation of Semantic Domain 
 - `compare_xlf.py` - Compare two XLF files to identify translation changes
 - `sort_comparisons.py` - Interactively sort comparison results into user-defined groups
 - `count_in_xlf.py` - Count trans-units in \_Poss groups by target state
+- `comma_lists.py` - Extract \_Name trans-units with mismatched comma-separated list lengths
 
 ## Script Details
 
@@ -257,6 +259,43 @@ Grand Total: 3584 trans-units across all children
 ================================================================================
 ```
 
+### comma_lists.py
+
+Extracts \_Name trans-units where comma-separated source and target have different lengths.
+
+**Purpose:** Identify semantic domain name translations where the number of comma-separated items differs between source and target. This helps catch missing or extra translations in list-style names (e.g., "Animals, Birds" should have the same number of items as its translation).
+
+**Input:** XLIFF files from `crowdin-exports/`
+
+**Output:** TSV files saved to `different-name-lists/`
+
+**Usage:**
+
+```bash
+# Extract mismatched name lists (output defaults to different-name-lists/)
+python comma_lists.py crowdin-exports/SemanticDomains_pt-BR.xliff
+
+# Specify a custom output file path
+python comma_lists.py crowdin-exports/SemanticDomains_pt-BR.xliff custom_output.tsv
+```
+
+**Output Format:** Tab-separated values (TSV) file with the following columns:
+
+- **Abbr Source** - The abbreviation from the corresponding \_Abbr trans-unit
+- **Name Source** - The semantic domain name in source language (English)
+- **Name Target** - The semantic domain name in target language (translation)
+- **Target State** - The state attribute of the target element
+
+**Example Output:**
+
+```
+Abbr Source	Name Source	Name Target	Target State
+1.2.3	Animals, Birds	Animais, Pássaros, Insetos	translated
+2.1.4	Think, Reflect	Pensar	final
+```
+
+In the first row, source has 2 items but target has 3. In the second row, source has 2 items but target has only 1. These entries require review.
+
 ## Data Folders
 
 Each subfolder contains specific types of Crowdin files. See individual folder READMEs for details:
@@ -267,6 +306,7 @@ Each subfolder contains specific types of Crowdin files. See individual folder R
 - [`xlf-comparisons/README.md`](xlf-comparisons/README.md) - Comparison results between XLF file versions
 - [`sorted-comparisons/README.md`](sorted-comparisons/README.md) - Interactively sorted and categorized comparison results
 - [`identical-translations/README.md`](identical-translations/README.md) - Translation analysis output files
+- [`different-name-lists/README.md`](different-name-lists/README.md) - Name trans-units with mismatched comma-separated list lengths
 
 ## License
 
