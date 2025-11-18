@@ -64,3 +64,11 @@ python extract_xlf.py -n crowdin-downloads/SemanticDomains.pt-BR.xlf custom_outp
 ```
 
 See the main [README](../README.md) for more details on extraction options.
+
+### Regex tricks
+
+You can use the following VSCode regex searches in a `*_names*` file:
+
+- `^[^\t]+\t[^\t]+\t[^A-Z]` (Match Case on) - translations that don't start with a capital
+- `^[^\t]+\t[^\t]+\t[^\n]+[^A-Z]` (Match Case on) - translations that have a non-initial capital letter
+- `^[^\t]+\t[^\t]*\b(\w+)\b[^\t]*\t[^\t]*\b\1\b` (Match Case off) - words that appear in both the second and third column
